@@ -1,0 +1,803 @@
+---
+title: \textcolor{blue}{DATA MANIPULATION AND WRANGLING IN R}
+author: \textcolor{blue}{Statistical Computing in R}
+date: "*Lecturer:Ivan Innocent Sekibenga*"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# \textcolor{red}{1. What is Data Manipulation and Wrangling?}
+
+Data manipulation and wrangling is the process of transforming and mapping data from one "raw" form into another format with the intent of making it more appropriate and valuable for a variety of downstream purposes such as analytics. This process is a fundamental step in data analysis and is often necessary to prepare data for visualization, statistical modeling, or machine learning. The goal of data manipulation and wrangling is to clean, structure, and enrich the data to ensure its quality and usability.
+
+In R, several packages are commonly used for data manipulation and wrangling, with the `dplyr` and `tidyr` packages from the `tidyverse` being among the most popular. These packages provide a set of functions that make it easy to perform tasks such as filtering, selecting, mutating, summarizing, and reshaping data. Here are some common data manipulation and wrangling verbs in R using the `dplyr` and `tidyr` packages:`select()`, `filter()`, `mutate()`, `arrange()`, `summarize()`, `group_by()`, `pivot_longer()`, `pivot_wider()`, `unite()`, `separate()`.
+
+# \textcolor{red}{2. Loading necessary packages}
+
+```{r}
+library(tidyverse) # Load the tidyverse package
+library(readxl)    # for importing excel files
+```
+
+# \textcolor{red}{3. Importing dataset to manipulate and wrangle}
+
+```{r}
+employees <- read_excel("Employees.xlsx")
+View(employees) # View the dataset
+# this dataset contains information about employees in a company,
+# including their names, departments, salaries, and hire dates etc
+```
+
+
+# \textcolor{red}{4. The Pipe Operator}
+
+The **pipe operator** is the foundation of tidyverse workflows. It allows you to **chain multiple operations together** in a readable way. Instead of nesting functions, you write them in a sequence that flows like a sentence.
+
+-   `%>%` → the `magrittr` pipe, widely used in tidyverse.
+
+-   `|>` → the base R pipe, available in R 4.1+.
+
+Both work similarly, but `%>%` is more common in tidyverse code.
+
+### 4.1 Windows keyboard shortcuts for pipes
+
+-   `%>%` (magrittr pipe): In RStudio, use `Ctrl + Shift + M`
+
+-   `|>` (base R pipe): In RStudio, newer versions also allow `Ctrl + Shift + M`
+
+### 4.2 Why use pipes?
+
+Pipes make your code **easier to read and understand** by breaking down complex operations into clear, sequential steps. Each step takes the output of the previous step as its input.
+
+-    **Readability**: Code reads from left to right, top to bottom, like a story.
+
+-   **Maintainability**: Easier to modify or debug individual steps.
+
+-    **Clarity**: Each operation is explicit, reducing confusion about data flow.
+
+### 4.3 How to use pipes
+
+The first step of a sequence of pipes can be a value, a variable, or a function, including arguments. The code below shows a series of examples of different ways of achieving the same result. The examples use the function `round`, which also allows for a second argument: `digits = 2`. Note that, when using the pipe operator, only the nominally second argument is provided to the function `round` – that is `round(digits = 2)`
+
+```{r}
+# No pipe, using variables or objects
+tmp_variable_A <- 2
+tmp_variable_B <- sqrt(tmp_variable_A)
+round(tmp_variable_B, digits = 2)
+
+# No pipe, using functions only
+round(sqrt(2), digits = 2)
+
+# Pipe starting from a value
+2 %>%
+  sqrt() %>%
+  round(digits = 2)
+
+# Pipe starting from a variable
+the_value_two <- 2
+the_value_two %>%
+  sqrt() %>%
+  round(digits = 2)
+
+# Pipe starting from a function
+sqrt(2) %>%
+ round(digits = 2)
+```
+
+A complex operation created through the use of `%>%` can be used on the right side of `<-`, to assign the outcome of the operation to a variable(object).
+
+```{r}
+sqrt_of_two <- 
+  2 %>%
+  sqrt() %>%
+  round(digits = 2)
+```
+
+**Example: Calculating average salary for IT employees**
+
+```{r}
+# Without pipe: nesting makes it harder to read
+
+summarise(filter(employees, Department == "IT"),
+  avg_salary = mean(`Annual Salary`, na.rm = TRUE))
+
+# With pipe: each step flows into the next, easier to follow
+
+employees %>%
+  filter(Department == "IT") %>%                # Step 1: keep only IT employees
+  summarise(avg_salary = mean(`Annual Salary`,# Step 2: calculate average salary
+                              na.rm = TRUE))   # Remove missing values
+
+```
+
+**When applicable:** Whenever your analysis involves **multiple tidyverse verbs in sequence**, pipes make the workflow **clean and logical**.
+
+**NB: FOR MOST OF THE EXAMPLES THAT FOLLOW,MODIFY THE CODE BY FORMING OBJECTS IN EACH CHUNK SO THAT YOU CAN VIEW THE ENTIRE OUTPUT AS A DATAFRAME INSTEAD OF A TIBBLE, WHERE NECESSARY.Use the `View()` function if needed.**
+
+
+# \textcolor{red}{5. select() – Choosing columns}
+
+`select()` helps you **pick or drop columns** from a dataset. It’s useful when you want to **focus only on variables of interest**.
+
+## *Example 5.1*: Select specific columns by name
+
+```{r}
+employees %>%
+  select(`Full Name`, Department, `Annual Salary`)
+# Keep only three variables
+
+```
+
+**Explanation:** Keeps only `Full Name`, `Department`, and `Annual Salary`.\
+**Situation:** Useful when preparing a **salary report** for HR that doesn’t need extra details.
+
+## *Example 5.2*: Exclude one column
+
+```{r}
+ employees %>%
+  select(-`Exit Date`)   # Drop the "Exit Date" column
+
+```
+
+**Explanation:** Removes the `Exit Date` column from the dataset.\
+**Situation:** When analyzing current employees, the exit date is irrelevant.
+
+## *Example 5.3*: Exclude multiple columns
+
+```{r}
+employees %>%
+  select(-c(`Exit Date`, Gender))   # Drop both Exit Date and Gender
+
+```
+
+**Explanation:** Removes both `Exit Date` and `Gender` columns.\
+**Situation:** When doing performance analysis, these variables may not matter.
+
+## *Example 5.4*: Select a range of columns
+
+```{r}
+employees %>%
+  select(`Full Name`:Gender)   # Select all columns between Full Name and Gender
+
+```
+**Explanation:** Selects all columns from `Full Name` to `Gender`.\
+**Situation:** Handy for quickly grabbing employee personal details stored together.
+
+## *Example 5.5*: Select columns starting with a prefix
+
+```{r}
+employees %>%
+  select(starts_with("Job"))   # Keep all columns starting with "Job"
+
+```
+
+**Explanation:** Selects columns like `Job Title`, `Job Level`, etc.\
+**Situation:** Useful when focusing on job-related information or attributes.
+
+## *Example 5.6*: Select columns ending with "Date"
+
+```{r}
+employees %>%
+  select(ends_with("Date"))   # Keep only date fields
+
+```
+
+**Explanation:** Selects columns like `Hire Date`, `Exit Date`\
+**Situation:** When analyzing employment timelines or tenure i.e helpful when analyzing hiring versus exit trends.
+
+## *Example 5.7*: Select columns containing "Unit"
+
+```{r}
+employees %>%
+  select(contains("Unit"))   # Selects columns that have "Unit" in the name
+
+```
+**Explanation:** Selects columns like `Business Unit`, `Cost Unit`\
+**Situation:** For reports that need organizational units.
+
+## *Example 5.8*: Select only numeric columns
+
+```{r}
+employees %>%
+  select(where(is.numeric))   # Keeps only numeric variables
+
+```
+
+**Explanation:** Selects all columns with numeric data types i.e eliminates text fields, keeps salaries,ages etc .\
+**Situation:** When performing statistical analysis or calculations requiring numbers only.
+
+## *Example 5.9*: Select only text columns
+
+```{r}
+employees %>%
+  select(where(is.character))   # Keeps only character (text) variables
+
+```
+
+**Explanation:** Selects all columns with text data types i.e eliminates numeric fields, keeps names,departments etc .\
+**Situation:** When preparing reports or summaries that focus on descriptive information and its good for text cleaning or name standardization.
+
+## *Example 5.10*: Rename columns while selecting
+```{r}
+employees %>%
+  select(EmployeeName = `Full Name`, Dept = Department, Salary = `Annual Salary`)   # Rename while selecting
+```
+
+**Explanation:** Selects and renames columns for clarity.\
+**Situation:** When preparing data for reports, sharing or presentations where concise or shorter names are preferred.This operation does not change the original dataset.
+
+## *Example 5.11*: Select first three columns by index
+
+```{r}
+employees %>%
+  select(1:3)   # Choose first three columns by position
+
+```
+
+**Explanation:** Selects the first three columns based on their position in the dataset.\
+**Situation:** When the structure of the dataset is known and you want to quickly grab the first few columns without specifying names.
+
+## *Example 5.12*: Reorder columns with Department first
+
+```{r}
+employees %>%
+  select(Department, everything())   # Move Department to front, keep all others
+
+```
+
+**Explanation:** Moves the `Department` column to the front while keeping all other columns in their original order.\
+**Situation:** When you want to highlight the department information in reports or analyses i.e For reports sorted by Department.
+
+# \textcolor{red}{6. filter() – Keep only the rows that meet conditions}
+
+`filter()` helps you **keep only the rows that meet certain conditions**. It’s useful for **subsetting data** based on specific criteria.
+
+## *Example 6.1*: Filter employees in the IT department
+
+```{r}
+
+employees %>%
+  filter(Department == "IT")   # keep rows where Department equals "IT"
+
+```
+
+**What this does:** returns only employees in the IT department.\
+**When applicable:** when building a report for the IT leadership team.
+
+## *Example 6.2*:  Filter or keep employees with salary > 100000
+
+```{r}
+
+employees %>%
+  filter(`Annual Salary` > 100000)   # Keep employees with salary > 100000
+
+```
+
+**What this does:** returns employees earning more than 100,000.\
+**When applicable:** when analyzing high earners for bonus considerations.
+
+## *Example 6.3*: Finance employees under age 40 (AND condition)
+
+```{r}
+employees %>%
+  filter(Department == "Finance" & Age < 40)   # Keep Finance employees under 40
+```
+**What this does:** returns Finance employees younger than 40.\
+**When applicable:** when targeting younger finance staff for a training program.
+
+## *Example 6.4*: Employees in IT or HR departments (OR condition)  
+
+```{r}
+ employees %>%
+  filter(Department == "IT" | Department == "Human Resources")   # Keep employees in IT or Human Resources
+
+```
+**What this does:** returns employees in either IT or HR.\
+**When applicable:** when preparing a cross-departmental collaboration report or cross-department policy roll out for Human Resources & IT.
+
+## *Example 6.5*: Employees hired after 2020-01-01
+```{r}
+employees %>%
+  filter(`Hire Date` > as.Date("2020-01-01"))   # Keep employees hired after Jan 1, 2020
+```
+**What this does:** returns employees hired after January 1, 2020.\
+**When applicable:** when analyzing recent hires for onboarding feedback.
+
+## *Example 6.6*: Employees with missing exit dates (current employees)
+
+```{r}
+employees %>%
+  filter(is.na(`Exit Date`))   # Keep employees with missing Exit Date
+```
+**What this does:** returns employees who are still with the company (no exit date).\
+**When applicable:** when generating a list of current employees for internal communications.
+
+## *Example 6.7*: Employees with non-missing exit dates (former employees)
+
+```{r}
+employees %>%
+  filter(!is.na(`Exit Date`))   # Keep employees with non-missing Exit Date 
+                                #  i.e these are former employees
+```
+**What this does:** returns employees who have left the company (have an exit date).\
+**When applicable:** when analyzing turnover rates or exit interviews.
+
+## *Example 6.8*:Employees with age between 30 and 40 (inclusive) 
+
+```{r}
+employees %>%
+  filter(between(Age, 30, 40))   # Keep employees aged between 30 and 40
+                                 # shorthand for Age >=30 & Age <=40
+```
+
+**What this does:** returns employees aged 30 to 40.\
+**When applicable:** when targeting a specific age group for wellness programs or benefits.
+
+## *Example 6.9*: Employees in specific departments (using %in%)
+
+```{r}
+sa <- employees %>%
+  filter(Department %in% c("IT", "Finance", "Human Resources"))
+View(sa)# Keep employees in IT, Finance, or Human Resources
+```
+
+**What this does:** returns employees in IT, Finance, or Human Resources.\
+**When applicable:** when preparing a report for multiple departments or cross-functional teams.
+
+## *Example 6.10*: Employees not in specific departments (using !%in%)
+```{r}
+employees %>%
+  filter(!Department %in% c("IT", "Finance"))   # Keep employees not in IT or Finance
+```
+**What this does:** returns employees not in IT or Finance.\
+**When applicable:** when analyzing departments outside of IT and Finance for organizational changes.
+
+## *Example 6.11*: Female managers (string equality and Job Title check)
+
+```{r}
+
+employees %>%
+  filter(Gender == "Female", `Job Title` == "Manager") # keep all female managers
+
+```
+
+**What this does:** returns all female employees with the job title "Manager".\
+**When applicable:** when preparing diversity reports or leadership analyses.
+
+## *Example 6.12*: Employees whose city is Miami (string equality)
+
+```{r}
+employees %>%
+  filter(City == "Miami")   # keep employees located in Miami
+```
+
+**What this does:** keeps employees located in Miami.\
+**When applicable:** when analyzing location-specific data or planning local events.
+
+## *Example 6.13*: Employees still employed (no Exit Date)
+
+```{r}
+employees %>%
+  filter(is.na(`Exit Date`))   # keeps rows where Exit Date is missing (NA)
+```
+
+**What this does:** retains active employees only.
+**When applicable:** payroll processing or headcount reporting.
+
+# \textcolor{red}{7. summarise() –collapse rows to summary values }
+
+The `summarise()` function is used to compute single-value summaries such as mean, sum, counts, min/max and  distinct counts. This verb or function is often used with `group_by()`
+
+## *Example 7.1*: Overall average annual salary
+
+```{r}
+ employees %>%
+  summarise(avg_salary = mean(`Annual Salary`, na.rm = TRUE))   # mean of `Annual Salary` column
+# na.rm = TRUE ignores missing values
+# returns a single value: the average salary across all employees
+# avg_salary is the assigned name of the new summary column  
+# avg_salary is also the object storing the value 113217.4,	
+# which is the average salary across all employees
+```
+
+**What this does:** single-row result with avg_salary.\
+**When applicable:** when need to compute average salary for all employees
+
+## *Example 7.2*: Count of employees
+```{r}
+employees %>%
+  summarise(total_employees = n())   # n() returns number of rows
+```
+**What this does:** total headcount.\
+**When applicable:** workforce size reporting.
+
+## *Example 7.2*: Minimum and maximum salary in one call
+
+```{r}
+employees %>%
+  summarise(min_salary = min(`Annual Salary`, na.rm = TRUE),
+            max_salary = max(`Annual Salary`, na.rm = TRUE))   # multiple summaries
+# min_salary and max_salary are new column names
+# na.rm = TRUE ignores missing values
+```
+**What this does:** returns lowest and highest pay or salary values.\
+**When applicable:** salary range checks.
+
+## *Example 7.3*: Median age
+
+```{r}
+employees %>%
+  summarise(median_age = median(Age, na.rm = TRUE)) # median of Age column
+# median_age is the assigned name of the new summary column
+# na.rm = TRUE ignores missing values
+```
+**What this does:** returns median age to identify the center of age distribution. .\
+**When applicable:** workforce demographic summary or age distribution analysis.
+
+## *Example 7.4*: Standard deviation of salaries
+
+```{r}
+employees %>%
+  summarise(sd_salary = sd(`Annual Salary`, na.rm = TRUE))  # standard deviation of Annual Salary
+# sd_salary is the assigned name of the new summary column
+# na.rm = TRUE ignores missing values
+```
+**What this does:** dispersion of salaries.\
+**When applicable:** assessing pay equity or variability.
+
+## *Example 7.4*: Number of unique departments
+
+```{r}
+employees %>%
+  summarise(unique_departments = n_distinct(Department))   # count distinct departments
+# unique_departments is the assigned name of the new summary column
+# n_distinct() counts unique values
+```
+
+**What this does:** returns count of unique departments.\
+**When applicable:** organizational structure analysis or diversity reporting.
+
+## *Example 7.5*: Total payroll (sum of all salaries)
+
+```{r}
+employees %>%
+  summarise(total_payroll = sum(`Annual Salary`, na.rm = TRUE))   # sum of Annual Salary column
+# total_payroll is the assigned name of the new summary column
+# na.rm = TRUE ignores missing values
+```
+
+**What this does:** total annual payroll cost.\
+**When applicable:** finance budgeting and headcount cost.
+
+## *Example 7.6*:  Ratio of males to females
+
+```{r}
+employees %>%
+  summarise(male_count = sum(Gender == "Male"),      
+            female_count = sum(Gender == "Female"),
+            male_to_female = male_count / female_count)
+# male_count is the count of all male employees
+# female_count is the count of all female employees
+# male_to_female is the ratio of males to females
+```
+
+**What this does:** returns the ratio\
+**When applicable:** diversity and inclusion reporting or gender balance reporting.
+
+## *Example 7.7*: Summarise multiple numeric columns at once using across()
+
+```{r}
+employees %>%
+  summarise(across(c(Age, `Annual Salary`, `Bonus %`),
+                   list(mean = ~mean(.x, na.rm = TRUE),
+                        sd   = ~sd(.x, na.rm = TRUE))))
+# across() applies functions to multiple columns
+# list() defines multiple summary functions
+# .x refers to each column being summarized
+```
+**What this does:** returns mean and standard deviation for Age, Annual Salary, and Bonus %.\
+**When applicable:** comprehensive numeric summaries for key metrics.
+
+## *Example 7.8*: Count of employees by department
+
+```{r}
+employees %>%
+  group_by(Department) %>%   # Step 1: group by Department
+  summarise(count = n())     # Step 2: count employees in each department
+```
+**What this does:** returns employee counts per department.\
+**When applicable:** workforce distribution analysis or departmental reporting.
+
+## *Example 7.9*: Average salary by department
+
+```{r}
+employees %>%
+  group_by(Department) %>%   # Step 1: group by Department
+  summarise(avg_salary = mean(`Annual Salary`, na.rm = TRUE))   # Step 2: average salary per department
+```
+**What this does:** returns average salary for each department.\
+**When applicable:** salary benchmarking or departmental budget planning.
+
+## *Example 7.10*: Maximum and minimum age by department
+
+```{r}
+employees %>%
+  group_by(Department) %>%   # Step 1: group by Department
+  summarise(min_age = min(Age, na.rm = TRUE),
+            max_age = max(Age, na.rm = TRUE))   # Step 2: min and max age per department
+```
+**What this does:** returns minimum and maximum age for each department.\
+**When applicable:** demographic analysis or age diversity reporting by department.
+
+\newpage
+# \textcolor{red}{8. mutate() — add or transform columns (does not reduce row count)}
+
+`mutate()` helps you **add new columns or transform existing ones**. It’s useful for **creating derived variables** or modifying data. Used to create derived features, flags, cleaned strings and computed numeric columns.
+
+## *Example 8.1*: Add a new column for monthly salary
+
+```{r}
+employees %>%
+  mutate(Monthly_Salary = `Annual Salary` / 12)   # New column: Monthly_Salary
+```
+
+**What this does:** adds a `Monthly_Salary` column by dividing annual salary by 12.\
+**When applicable:** when preparing payroll reports or budgeting monthly expenses.
+
+## *Example 8.2*: Create a flag for high earners (salary > 100000)
+
+```{r}
+employees %>%
+  mutate(High_Earner = ifelse(`Annual Salary` > 100000, TRUE, FALSE))   # New column: High_Earner flag
+# ifelse() is used to create conditional values
+# TRUE if salary > 100000, else FALSE
+
+```
+
+**What this does:** adds a `High_Earner` boolean column.\
+**When applicable:** when identifying employees for bonus eligibility or special programs.
+
+## *Example 8.3*: Standardize job titles to lowercase
+
+```{r}
+employees %>%
+  mutate(Job_Title = tolower(`Job Title`))   # Transform Job Title to lowercase
+```
+
+**What this does:** converts all job titles to lowercase for consistency.\
+**When applicable:** when cleaning data for analysis or reporting.
+
+## *Example 8.4*:Bonus amount in currency
+
+```{r}
+employees %>%
+  mutate(Bonus_Amount = `Bonus %`  * `Annual Salary`)   # New column: Bonus_Amount
+```
+
+**What this does:** calculates the actual bonus amount based on the bonus percentage and annual salary.\
+**When applicable:** when preparing compensation reports or financial planning.
+
+## *Example 8.5*:  Salary in thousands (easier readability)
+
+```{r}
+employees %>%
+  mutate(salary_k = `Annual Salary` / 1000)   # scale down salary
+# New column: salary_k (salary in thousands)
+```
+
+**What this does:** adds a `salary_k` column for salary in thousands.\
+**When applicable:** when creating reports where large numbers are easier to read in thousands or plots or tables where thousands improve readability. .
+
+## *Example 8.6*: Extract hire year from hire date
+
+```{r}
+employees %>%
+  mutate(Hire_Year = lubridate::year(`Hire Date`))   # New column: Hire_Year
+```
+**What this does:** adds a `Hire_Year` column by extracting the year from the hire date.\
+**When applicable:** when analyzing hiring trends over time or cohort analyses.
+
+## *Example 8.7*:  Age group (categorical) using case_when
+
+```{r}
+employees %>%
+  mutate(age_group = case_when(
+    Age < 30 ~ "Young",
+    Age < 50 ~ "Mid-career",
+    TRUE     ~ "Senior"))   # create categorical column from numeric Age
+# case_when() allows multiple conditions
+# TRUE is the default case for Age >= 50
+```
+**What this does:** adds an `age_group` column categorizing employees into "Young", "Mid-career", and "Senior" i.e assigns age group labels\
+**When applicable:** when segmenting workforce for targeted programs or analyses.
+
+## *Example 8.8*:  Create combined location string
+
+```{r}
+employees %>%
+  mutate(Location = paste(Country, City, sep = ", "))   
+# New column: Location (Country, City)
+```
+
+**What this does:** adds a `Location` column combining country and city.\
+**When applicable:** when preparing location-based reports or visualizations.
+
+## *Example 8.9*:  Fill missing Exit Date with a sentinel value (e.g., "Still Employed")
+
+```{r}
+employees %>%
+  mutate(ExitDate_clean = coalesce(as.character(`Exit Date`), "Still Employed"))
+# coalesce() returns first non-NA value; convert date to string for consistency
+# New column: ExitDate_clean
+# as.character() converts date to string for consistency
+# a string value "Still Employed" is used for missing exit dates
+```
+**What this does:** adds an `ExitDate_clean` column replacing missing exit dates with "Still Employed".\
+**When applicable:** when preparing reports that need a clear indication of current employees and reporting where NA would be confusing to non-technical audiences.
+
+\newpage
+# \textcolor{red}{9. arrange() —reorder rows (sorting) }
+
+arrange() helps you **sort rows** based on one or more columns. It’s useful for **organizing data** for reports or analyses.
+
+## *Example 9.1*: Sort employees by annual salary (ascending)
+
+```{r}
+employees %>%
+  arrange(`Annual Salary`)   # Sort by Annual Salary (lowest to highest)
+```
+**What this does:** sorts employees from lowest to highest salary.\
+**When applicable:** when preparing salary reports or identifying low earners.
+
+## *Example 9.2*: Sort employees by annual salary (descending)
+
+```{r}
+employees %>%
+  arrange(desc(`Annual Salary`))   # Sort by Annual Salary (highest to lowest)
+```
+**What this does:** sorts employees from highest to lowest salary.\
+**When applicable:** when preparing executive reports or identifying top earners.
+
+## *Example 9.3*: Sort by department, then by salary within each department
+
+```{r}
+employees %>%
+  arrange(Department, desc(`Annual Salary`))   # Sort by Department, then by Annual Salary (desc)
+# desc() sorts in descending order
+```
+
+**What this does:** sorts first by department, then by salary within each department.\
+**When applicable:** when preparing departmental salary reports or analyses that require hierarchical sorting.
+
+## *Example 9.4*: Sort by hire date (oldest to newest)
+
+```{r}
+employees %>%
+  arrange(`Hire Date`)   # Sort by Hire Date (oldest to newest) with earliest hire at top
+```
+**What this does:** sorts employees from oldest to newest hire date.\
+**When applicable:** find longest-tenured employees.
+
+\newpage
+
+# \textcolor{red}{10. group by()}
+
+The `group_by()` function is used to group data by one or more variables. It is
+often used in conjunction with `summarise()` to perform calculations on each group separately.
+
+## *Example 10.1*: Group by department and calculate average salary
+
+```{r}
+employees %>%
+  group_by(Department) %>%   # Step 1: group by Department
+  summarise(avg_salary = mean(`Annual Salary`, na.rm = TRUE))   # Step 2: average salary per department
+```
+**What this does:** returns average salary for each department.\
+**When applicable:** salary benchmarking or departmental budget planning.
+
+## *Example 10.2*: Group by department and count employees
+
+```{r}
+employees %>%
+  group_by(Department) %>%   # Step 1: group by Department
+  summarise(count = n())     # Step 2: count employees in each department
+```
+**What this does:** returns employee counts per department.\
+**When applicable:** workforce distribution analysis or departmental reporting.
+
+## *Example 10.3*: Salary summary statistics by Gender
+
+```{r}
+employees %>%
+  group_by(Gender) %>%
+  summarise(min_salary = min(`Annual Salary`, na.rm = TRUE), # minimum salary
+            max_salary = max(`Annual Salary`, na.rm = TRUE), # maximum salary
+            avg_salary = mean(`Annual Salary`, na.rm = TRUE)) # average salary
+```
+**What this does:** minimum,maximum and average salary by gender\
+**When applicable:** pay equity analysis or diversity reporting or gender pay gap analysis.
+
+## *Example 10.4*: Total bonus payout by Department
+
+```{r}
+employees %>%
+  group_by(Department) %>%
+  summarise(total_bonus = sum(`Bonus %` * `Annual Salary`, na.rm = TRUE))   # total bonus payout
+# sum of (Bonus % * Annual Salary) gives total bonus amount
+# total_bonus is the assigned name of the new summary column
+```
+**What this does:** returns total bonus payout for each department.\
+**When applicable:** budgeting for bonuses or departmental compensation planning.
+
+## *Example 10.5*: Average age and salary by Department
+
+```{r}
+employees %>%
+  group_by(Department) %>%
+  summarise(avg_age = mean(Age, na.rm = TRUE),   # average age
+            avg_salary = mean(`Annual Salary`, na.rm = TRUE)) # average salary
+```
+**What this does:** returns average age and salary for each department.\
+**When applicable:** demographic and compensation analysis by department.
+
+## *Example 10.6*: Proportion of workforce in each Department
+
+```{r}
+employees %>%
+  group_by(Department) %>%
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count))   # proportion of total workforce
+```
+**What this does:** returns the proportion of employees in each department or proportion of workforce in each Department .\
+**When applicable:** organizational structure analysis or workforce distribution reporting.
+
+## *Example 10.7*:  Highest-paid employee per Department (use slice_max)
+
+```{r}
+employees %>%
+  group_by(Department) %>%
+  slice_max(order_by = `Annual Salary`, n = 1)   # get row(s) with max salary per group
+# slice_max() returns rows with highest values in specified column
+# n = 1 returns the top row only
+# order_by specifies the column to determine the maximum
+```
+**What this does:** returns the highest-paid employee in each department.\
+**When applicable:** identifying top talent or benchmarking salaries by department.
+
+## *Example 10.8*:  Lowest-paid employee per Department (use slice_min)
+
+```{r}
+employees %>%
+  group_by(Department) %>%
+  slice_min(order_by = `Annual Salary`, n = 1)   # get row(s) with min salary per group
+# slice_min() returns rows with lowest values in specified column
+# n = 1 returns the bottom row only
+# order_by specifies the column to determine the minimum
+```
+**What this does:** returns the lowest-paid employee in each department.\
+**When applicable:** identifying entry-level roles or benchmarking salaries by department.
+
+## *Example 10.9*: Mark high earners per Department (create a per-group flag)
+
+```{r}
+employees %>%
+  group_by(Department) %>%
+  mutate(dept_median = median(`Annual Salary`, na.rm = TRUE),
+         above_median = `Annual Salary` > dept_median) %>%
+  ungroup()   # remove grouping after per-group operations
+```
+**What this does:** adds a flag indicating if an employee earns above the median salary for their department.\
+**When applicable:** identifying high performers or salary benchmarking within departments or identify internal high performers relative to peers.
+
+```{r}
+glimpse(employees)
+```
+```{r}
+data(state)
+state.x77
+View(as.data.frame(state.x77))
+```
+
