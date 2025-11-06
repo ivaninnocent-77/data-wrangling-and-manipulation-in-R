@@ -1,0 +1,205 @@
+---
+title:  \textcolor{blue}{MANAGING PACKAGES AND READING IN FILES}
+author:  \textcolor{blue}{Statistical Computing in R}
+date: "**Lecturer: Ivan Innocent Sekibenga**"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## \textcolor{red}{1. INSTALLATION AND LOADING OF PACKAGES.}
+
+Packages in R are collections of R functions, data, and compiled code in a well-defined format. The directory where packages are stored is called the library. R comes with a standard set of packages, but you can also install additional packages from CRAN (the Comprehensive R Archive Network) or other repositories.
+
+**Note:** You need an internet connection to install packages from CRAN or other repositories.
+
+## \textcolor{red}{Commonly used packages and their use in R}
+
+Some common packages include:`tidyverse` (data manipulation and visualization)which contains `dplyr` (data manipulation), `ggplot2` (data visualization), `readr` (data import), `tidyr` (data tidying or cleaning),`tibble`(dataframes plus fast and accurate data upload) and `forcats`(categorical variables). For more information on `tidyverse`, type the function help(tidyverse) into a code chunk.
+
+Others include; `readxl`(read excel files),`lubridate` (date and time manipulation), `stringr` (string or text manipulation), `caret` (machine learning), `randomForest` (random forest algorithm), `shiny` (interactive web applications), `rmarkdown` (dynamic documents), `knitr` (report generation),`tidymodels`(machine learning).
+
+## \textcolor{red}{Package installation}
+
+Packages can be installed from CRAN using the `install.packages()` function in a chunk or by using the RStudio interface.To use the RStudio interface, go to the "Packages" tab in the bottom right panel of RStudio, click on "Install", and then type the name of the package you want to install in the dialog box that appears. You can also select multiple packages to install at once by separating their names with commas.
+
+### \textcolor{red}{1. Code packages}
+
+To install a package, you can use the `install.packages()` function. For example, to install the \`readxl\`\` package, you would run the following command in your chunk:
+
+`install.packages("readxl")`
+
+You can also install multiple packages at once by passing a vector of package names to the `install.packages()` function in your code chunk:
+
+`install.packages(c("randomForest", "caret"))`
+
+### \textcolor{red}{2. Data packages}
+
+We can also install packages that hold data. We will be using data from Nate Silver’s statistical analysis website—fivethirtyeight. The `fivethirtyeight` package includes 128 callable datasets. For a full list of datasets, follow this link: <https://cran.r-project.org/web/packages/fivethirtyeight/vignettes/fivethirtyeight.html>. To install this package, use the code below. Remember to wrap the package in quotes when you are installing it.
+
+`install.packages("fivethirtyeight")`
+
+R base also comes with its own inbuilt datasets. To see all inbuilt R datasets that are available to you as callable objects, run the function
+
+`data()` in your code chunk:
+
+To find more information about a specific dataset, you can use the `?` operator followed by the dataset name. For example, to get more information about the `mtcars` dataset, you would run:
+
+
+```{r}
+?mtcars  # displays information about the mtcars dataset
+```
+
+The information is displayed in the Help pane of RStudio. It contains a description of the dataset, the format of the data, and the source of the data and examples of how to use the dataset.
+
+## \textcolor{red}{2. LOADING INSTALLED PACKAGES (LIBRARIES)}
+
+After installing a package, you need to load it into your R session using the `library()` function. You only need to install a package once, but you need to load it into your R session every time you start a new R session.
+
+You do not need to use quotes when calling packages you have already installed. For example, to load the `readxl` package, you would run the following command in your code chunk:
+
+`library(readxl)`
+
+The same applies to loading the `fivethirtyeight` package.
+
+`library(fivethirtyeight)`
+
+## \textcolor{red}{Examples of installing and loading package from fivethirtyeight and using inbuilt R datasets}
+
+
+## \textcolor{red}{1. Example on fivethirtyeight package}
+
+`install.packages("fivethirtyeight")` :installs the `fivethirtyeight` package.
+
+```{r}
+library(fivethirtyeight) # loads the fivethirtyeight package
+```
+
+The `drinks` dataset is part of the `fivethirtyeight` package.
+
+```{r}
+dr <- drinks   # loads the drinks dataset and assigns it to the object dr
+
+head(dr) # displays first six rows in a tibble
+```
+
+You can also use the `View()` function to view the dataset in a spreadsheet-like format.
+
+`View(dr)` :viewing the dataset in a spreadsheet-like format:
+
+### \textcolor{red}{2. Example on inbuilt R datasets}
+
+`LakeHuron` is a time series inbuilt R dataset of water Level of Lake Huron from 1875-1972
+
+```{r}
+lh <- LakeHuron # Loads the dataset and assigns it to object lh
+lh              # displays the timeseries dataset
+```
+
+**Note:** The `View()` function does not work on time series datasets.
+
+## \textcolor{red}{3. OBTAINING AND LOADING EXTERNAL DATASETS}
+
+1.  Downloading external data from Kaggle. Visit <https://www.kaggle.com/datasets> to download datasets of your choice. You will need to create an account on Kaggle to download datasets.
+
+2.  After downloading the dataset, you can use the `read_csv()` function to read in the data into R. For example, if you downloaded a dataset called `data.csv`, you would use the following command in your code chunk:
+
+`data <- read_csv("path/to/data.csv")` or
+
+simply `data <- read_csv("data.csv")`
+
+if the file is in your working directory. You can check your working directory using the `getwd()` function and set it using the `setwd()` function.
+
+## \textcolor{red}{Loading different file formats}
+
+These examples assume that the files are in your working directory. If they are not, you will need to provide the full path to the file.
+
+##  \textcolor{red}{Importing sas files using the `haven` package.}
+
+sas files are files with the extension `.sas7bdat`and are commonly used in statistical analysis. They can be imported into R using the `haven` package.They are created using the SAS software. 
+
+SAS stands for Statistical Analysis System and is a software suite used for advanced analytics, business intelligence, data management, and predictive analytics.
+
+```{r}
+library(haven) # load haven package
+
+sas_data <- read_sas("Public_library.sas7bdat") # read in sas data file
+
+head(sas_data) # display first six rows of the sas dataset)
+```
+
+
+##  \textcolor{red}{Importing stata files using the `haven` package.}
+
+
+Stata files are files with the extension `.dta` and are commonly used in statistical analysis. They can be imported into R using the `haven` package. Stata is a software package used for data management, statistical analysis, and graphics.
+
+```{r}
+library(haven) # load haven package
+
+stata_data <- read_dta("household.dta") # read in stata data file
+
+head(stata_data) # display first six rows of the stata dataset
+```
+
+##  \textcolor{red}{Importing csv files using the `readr` package.}
+
+csv files are files with the extension `.csv` and are commonly used for storing tabular data. They can be imported into R using the `readr` package. csv stands for Comma Separated Values.
+
+```{r}
+library(readr) # load readr package
+
+data <- read_csv("Financial.csv") # read in csv data file
+
+head(data) # display first six rows of the csv dataset
+```
+###  \textcolor{red}{Investigate the csv dataset}
+
+```{r}
+class(data) # class of the csv dataset
+```
+
+```{r}
+names(data) # variable names of the csv dataset
+```
+
+```{r}
+dim(data) # dimensions of the csv dataset
+```
+
+##  \textcolor{red}{Importing excel files using the `readxl` package.}
+
+Excel files are files with the extension `.xlsx` or `.xls` and are commonly used for storing tabular data. They can be imported into R using the `readxl` package. Excel is a spreadsheet software developed by Microsoft.
+
+```{r}
+library(readxl) # load readxl package
+
+excel_data <- read_excel("Employees.xlsx") # read in excel data file
+
+head(excel_data) # display first six rows of the excel dataset
+```
+
+##  \textcolor{red}{Importing sav files using the `haven` package.}
+
+sav files are files with the extension `.sav` and are commonly used in statistical analysis. They can be imported into R using the `haven` package. SPSS stands for Statistical Package for the Social Sciences and is a software package used for statistical analysis.
+
+```{r}
+library(haven) # load haven package
+
+sav_data <- read_sav("household.sav") # read in sav data file
+
+head(sav_data) # display first six rows of the sav dataset
+```
+
+## \textcolor{red}{Practical Exercise.}
+
+Import text files using the readr package. The text file is called `city_temperature.txt`. After importing, investigate the dataset using the functions `class()`, `names()`, and `dim()`. 
+The code to use is provided below.
+
+```{r,eval=FALSE, echo=TRUE}
+library(readr) # load readr package
+text_data <- read_tsv("city_temperature.txt") # read in text data file
+
+
