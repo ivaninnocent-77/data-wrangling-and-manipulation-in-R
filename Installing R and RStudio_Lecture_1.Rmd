@@ -1,0 +1,86 @@
+---
+title:  \textcolor{blue}{DOWNLOADING AND INSTALLING R AND RSTUDIO}
+author:  \textcolor{blue}{Statistical Computing in R}
+date: "**Lecturer: Ivan Innocent Sekibenga**"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# \textcolor{red}{1. Downloading the latest version of R for Windows}
+
+R is a free software environment for statistical computing and graphics. It is widely used by statisticians, data scientists, and researchers for data analysis and visualization. To get started with R, you need to download and install the latest version of R for Windows. The latest version of R can be downloaded here at <https://cran.r-project.org/bin/windows/base/>. as shown in *Figure 1* below.
+
+![The R for Windows download page](R_download.jpg){width="597" height="278"}
+
+# \textcolor{red}{2. Downloading the latest version of RStudio for Windows}
+
+You can also download the latest version of RStudio here at <https://posit.co/download/rstudio-desktop/>. as shown in *Figure 2.* on page 2.
+
+![The RStudio download page](Rstudio_download.jpg){width="560" height="243"}
+
+# \textcolor{red}{3. Installation of R, followed by RStudio}
+
+After downloading the R installer, run it and follow the installation instructions. The default settings are usually sufficient for most users. You can then install RStudio by running the downloaded installer and following the installation instructions. Again, the default settings are usually sufficient.
+
+After installing R and RStudio, you can open RStudio. The interface consists of several panes as shown in *Figure 3.* on page 2.
+
+![The RStudio interface with panes](Rstudio_interface.jpg){width="628" height="459"}
+
+# \textcolor{red}{4. RStudio interface and panes}
+
+RStudio is an integrated development environment (IDE) for R that provides a user-friendly interface for writing and executing R code. It is highly recommended for both beginners and experienced R users due to its powerful features and ease of use.
+
+The RStudio interface consists of four main panes, as shown in *Figure 3* on page 2:
+
+1.  **Source Pane**: This is where you can write and edit your R scripts and R Markdowns. You can open multiple scripts in tabs.
+
+2.  **Console Pane**: This is where you can interact with R directly. You can type R commands here and see the output immediately.
+
+3.  **Environment/History Pane**: This pane shows the objects in your R environment and your command history. You can view and manage your variables here.
+
+4.  **Files/Plots/Packages/Help Pane**: This pane allows you to navigate your files, view plots, manage packages, and access help documentation.\
+
+# \textcolor{red}{5. Working with R Markdown in RStudio}
+
+R Markdown is a powerful tool for creating dynamic documents that combine code, text, and visualizations. In RStudio, you can create a new R Markdown document by going to `File` \> `New File` \> `R Markdown...`. This will open a dialog where you can specify the title, author, and output format (HTML, PDF, or Word).Your computer must have an installation of Miktex to support PDF output. You must also have microsoft office installed on your computer to support Word output.
+
+# \textcolor{red}{6. Installation of Miktex to support PDF output}
+
+You can download Miktex from <https://miktex.org/download> and install it on your computer. After installing Miktex, you can select the PDF output format when creating a new R Markdown document in RStudio.
+
+![website to download Miktex](miktex.jpg){width="500" height="250"}
+\newpage
+
+
+# \textcolor{red}{7. The Rmarkdow syntax and its usage}
+
+You can then write your content in the R Markdown document, using a combination of Markdown syntax for formatting text and R code chunks for executing R code. To run a code chunk, you can click the green play button in the top right corner of the chunk or use the keyboard shortcut `Ctrl + Shift + Enter` or simply `Ctrl + Enter`. To create empty new code chunks, you can use the keyboard shortcut `Ctrl + Alt + I` or go to `Code` \> `Insert Chunk` in the menu.
+
+You can also add text, headings, lists, and other formatting using Markdown syntax. For example, to create a heading, you can use `# Heading 1`, `## Heading 2`, and so on. For more details on Markdown syntax, you can refer to the R Markdown cheatsheet or the official documentation at <https://rmarkdown.rstudio.com/authoring_basics.html>.
+
+Please note that R Markdown documents are saved with the `.Rmd` file extension. When you save your R Markdown document, it will be saved in the current working directory, which you can check using the `getwd()` and You can also click on the terminal to know the current working directory. \## Setting the working directory You can set the working directory in RStudio by going to `Tools` \> `Global Options` \> `General`. This will allow you to navigate to the desired folder where you want to save your R Markdown documents and other files. Alternatively, you can use the `setwd()` function in the console to set the working direcrtory programmatically. For example, you can use `setwd("C:/path/to/your/directory")` to set the working directory to a specific folder on your computer.
+
+Refer to the R Markdown cheatsheets i shared in the class whatsapp groups on 11 August 2025 for more details on how to use R Markdown effectively or access them at <https://rstudio.github.io/cheatsheets/rmarkdown.pdf> and at <https://rstudio.github.io/cheatsheets/html/rmarkdown.html>.
+
+# \textcolor{red}{8. Visual and Source R Markdown editing modes}
+
+R Markdown documents can be edited in two modes: **Visual** and **Source**.
+
+1.  **The Visual mode** provides a WYSIWYG (What You See Is What You Get) editor, allowing you to format text easily without needing to know Markdown syntax.
+
+2.  **The Source mode** allows you to write raw Markdown and R code, giving you more control over the document's structure and formatting.
+
+When you are ready to render your R Markdown document, you can click the "**Knit**" button in the toolbar. This will execute all the code chunks and generate the output document in the specified format.
+
+# \textcolor{red}{9. Lab Practical: Exercise 1}
+
+Use R Markdown to reproduce these entire lecture notes with the figures as a three-page PDF document. You can consult the R Markdown cheatsheet for help at <https://rstudio.github.io/cheatsheets/rmarkdown.pdf> and use your Windows snipping tool to take screenshots of the figures from relevant websites on the internet. The solutions to the exercise are due on **24/08/2025**.
+
+
+
+
+
+
